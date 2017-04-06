@@ -7,8 +7,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by Zhuinden on 2016.08.13..
  */
-public class Book
-        extends RealmObject {
+public class Book extends RealmObject {
     @PrimaryKey
     private long id;
 

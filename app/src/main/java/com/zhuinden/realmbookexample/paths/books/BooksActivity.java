@@ -104,7 +104,8 @@ public class BooksActivity
                 .setTitle(getString(R.string.add_book))
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
                         booksPresenter.saveBook(dialogContract);
                         booksPresenter.dismissAddDialog();
                     }

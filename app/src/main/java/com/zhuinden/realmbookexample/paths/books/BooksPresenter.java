@@ -2,11 +2,8 @@ package com.zhuinden.realmbookexample.paths.books;
 
 import android.content.Context;
 
-import com.zhuinden.realmbookexample.application.RealmManager;
 import com.zhuinden.realmbookexample.data.entity.Book;
-import com.zhuinden.realmbookexample.data.entity.BookFields;
-
-import io.realm.Realm;
+import com.zhuinden.realmbookexample.data.dao.BookDao;
 
 /**
  * Created by Zhuinden on 2016.08.16..
@@ -71,61 +68,43 @@ public class BooksPresenter {
         }
     }
 
-    public void saveBook(ViewContract.DialogContract dialogContract) {
-        if(hasView()) {
-            final String author = dialogContract.getAuthor();
-            final String title = dialogContract.getTitle();
-            final String thumbnail = dialogContract.getThumbnail();
+    private Book getBookFromDC(ViewContract.DialogContract dialogContract,long id)
+    {
+        Book b = new Book();
+        b.setId(id);
+        b.setAuthor(dialogContract.getAuthor());
+        b.setImageUrl(dialogContract.getThumbnail());
+        b.setTitle(dialogContract.getTitle());
+
+        return b;
+    }
+
+    public void saveBook(ViewContract.DialogContract dialogContract)
+    {
+        if(hasView())
+        {
+            String title = dialogContract.getTitle();
 
             if(title == null || "".equals(title.trim())) {
                 viewContract.showMissingTitle();
-            } else {
-                Realm realm = RealmManager.getRealm();
-                realm.executeTransactionAsync(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        Book book = new Book();
-                        long id = 1;
-                        if(realm.where(Book.class).count() > 0) {
-                            id = realm.where(Book.class).max(BookFields.ID).longValue() + 1; // auto-increment id
-                        }
-                        book.setId(id);
-                        book.setAuthor(author);
-                        book.setDescription("");
-                        book.setImageUrl(thumbnail);
-                        book.setTitle(title);
-                        realm.insertOrUpdate(book);
-                    }
-                });
+            }
+            else
+            {
+                BookDao bookDao = new BookDao();
+                bookDao.create( getBookFromDC(dialogContract,0));
             }
         }
     }
 
-    public void deleteBookById(final long id) {
-        Realm realm = RealmManager.getRealm();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Book book = realm.where(Book.class).equalTo(BookFields.ID, id).findFirst();
-                if(book != null) {
-                    book.deleteFromRealm();
-                }
-            }
-        });
+    public void deleteBookById(final long id)
+    {
+        BookDao bookDao = new BookDao();
+        bookDao.delete(id);
     }
 
-    public void editBook(final ViewContract.DialogContract dialogContract, final long id) {
-        Realm realm = RealmManager.getRealm();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Book book = realm.where(Book.class).equalTo(BookFields.ID, id).findFirst();
-                if(book != null) {
-                    book.setTitle(dialogContract.getTitle());
-                    book.setImageUrl(dialogContract.getThumbnail());
-                    book.setAuthor(dialogContract.getAuthor());
-                }
-            }
-        });
+    public void editBook(final ViewContract.DialogContract dialogContract, final long id)
+    {
+        BookDao bookDao = new BookDao();
+        bookDao.update(getBookFromDC(dialogContract, id));
     }
 }

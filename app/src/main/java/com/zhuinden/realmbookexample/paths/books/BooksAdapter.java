@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.zhuinden.realmbookexample.R;
+import com.zhuinden.realmbookexample.data.dao.BookDao;
 import com.zhuinden.realmbookexample.data.entity.Book;
 
 import butterknife.BindView;
@@ -97,7 +98,8 @@ public class BooksAdapter extends RealmRecyclerViewAdapter<Book, BooksAdapter.Bo
             card.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    booksPresenter.deleteBookById(id);
+                    BookDao bDao = new BookDao();
+                    bDao.delete(id);
                     return false;
                 }
             });
